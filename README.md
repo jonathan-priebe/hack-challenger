@@ -1,10 +1,10 @@
 # hack-challenger
 
+> A documentation repository for solving security challenges (OWASP Juice Shop, Hack The Box, TryHackMe, ...)
+
 ## Project Handover  
 
 📄 [Juice Shop Meister Checkliste PDF](<./Juice Shop Meister Checkliste.pdf>)
-
-> A documentation repository for solving security challenges (OWASP Juice Shop, Hack The Box, TryHackMe, ...)
 
 ---
 
