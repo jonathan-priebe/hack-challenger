@@ -58,7 +58,3 @@ Burp Suite is a powerful web security testing tool used by penetration testers a
 - All user input must be validated and sanitized on the server side
 - APIs must enforce the same security rules as the frontend
 - Tools like Burp Suite are essential for identifying and exploiting backend weaknesses
-
----
-
-If you'd like to link this challenge to a central index or chain it with related XSS write-ups, I can help you structure that too.
