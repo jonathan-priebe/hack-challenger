@@ -1,45 +1,48 @@
-# Hacking Challenge Submission: SQL Injection + Broken Access Control
+# Challenge: SQL Injection + Broken Access Control
 
 ## Objective
-Gain administrative access and access the hidden administration panel by chaining a SQL Injection with direct URL access.
+Gain administrative access and access the hidden administration panel by chaining a SQL Injection vulnerability with direct URL access.
 
-## Procedure
+## How I Solved It
 
-### Step 1: SQL Injection Login
-I logged in as the "Admin" user by entering the following payload into the login form:
+### Step 1: Discovering and Exploiting SQL Injection
+
+To test for SQL Injection, I entered the following payload into the login form:
 
 ```
-' OR 1=1 --
+admin' OR 1=1 --
 ```
 
-#### Payload Explanation
-- The input sets the username to `admin' OR 1=1`.
-- `--` is an SQL comment that ignores the rest of the query.
-- This bypasses authentication by making the WHERE clause always true.
+This is a classic injection string used to bypass authentication by manipulating the SQL query logic. I placed it in the **email** field and submitted the form with any arbitrary password. The application logged me in as the administrator, confirming that user input was directly embedded into the backend SQL query without proper sanitization or parameterization.
+
+**Payload Breakdown:**
+- `admin' OR 1=1` sets the condition to always true.
+- `--` is an SQL comment that ignores the rest of the query, including the password check.
 
 **Resulting Query Example:**
 ```sql
 SELECT * FROM users WHERE email = 'admin' OR 1=1 -- ' AND password = '...';
 ```
 
-This allowed me to log in without knowing the actual password.
+### Step 2: Accessing the Admin Panel
 
-### Step 2: Brute-Forcing the Admin Panel URL
-After logging in, I manually tested common admin-related routes and discovered that the following URL loads the administration panel:
+After logging in as admin, I manually tested common admin-related routes. By entering the following URL directly into the browser:
 
 ```
 http://localhost:3000/#/administration
 ```
 
-No role-based access control was enforced — the route was simply hidden from the UI.
+I was able to access the administration panel. No role-based access control was enforced — the route was simply hidden from the UI.
 
 ## Result
-By chaining SQL Injection with direct URL access, I was able to:
-- Log in as the administrator
-- Access the administration panel
-- Complete both challenges: **SQL Injection** and **Broken Access Control**
+
+By chaining SQL Injection with direct URL access, I successfully:
+- Logged in as the administrator
+- Accessed the hidden administration panel
+- Solved both challenges: **SQL Injection** and **Broken Access Control**
 
 ## Takeaways
-- Authentication bypasses must be mitigated with input validation and parameterized queries.
+
+- SQL Injection must be mitigated using parameterized queries and strict input validation.
 - Sensitive routes must be protected by server-side access control, not just hidden from the frontend.
-- Security through obscurity is not a valid defense strategy.
+- Chaining vulnerabilities can lead to full system compromise and privilege escalation.

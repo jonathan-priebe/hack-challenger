@@ -4,9 +4,16 @@
 Log in as user **Jim** without knowing his password by exploiting a SQL Injection vulnerability in the login form.
 
 ## Background
-The Juice Shop login function is vulnerable to SQL Injection. This occurs when user input is directly embedded into a SQL query without proper validation or escaping, allowing attackers to manipulate the query logic.
 
-Typical SQL query:
+In the previous challenge ([SQL Injection + Broken Access Control](../../2-Star/Admin-Section/README.md)), I discovered a SQL Injection vulnerability in the login form by entering the following payload:
+
+```
+admin' OR 1=1 --
+```
+
+This allowed me to log in as the administrator without knowing the password. After gaining access to the administration panel, I was able to view Jim’s email address (`jim@juice-sh.op`). This confirmed that user input was directly embedded into a SQL query without proper validation or escaping.
+
+Typical vulnerable query:
 ```sql
 SELECT * FROM Users WHERE email = '[INPUT]' AND password = '[INPUT]';
 ```
@@ -14,9 +21,10 @@ SELECT * FROM Users WHERE email = '[INPUT]' AND password = '[INPUT]';
 By injecting crafted input, the password check can be bypassed entirely.
 
 ## My Approach
-Before attempting this challenge, I had already logged in as the administrator using SQL Injection. From the administration panel, I was able to view Jim’s email address (`jim@juice-sh.op`). With that information, I returned to the login form and used SQL Injection to log in as Jim.
 
-This demonstrates a chained attack: using one vulnerability [Brute-Forcing the Admin Panel URL](../../2-Star/Admin-Section/README.md#step-2-brute-forcing-the-admin-panel-url) to discover sensitive data, and another (SQL Injection) to escalate access.
+I reused the SQL Injection technique from the previous challenge, this time targeting Jim’s account. Since I had already retrieved his email address from the admin panel, I crafted a new injection payload using his known email to bypass authentication.
+
+This demonstrates a chained attack: using one vulnerability ([Brute-Forcing the Admin Panel URL](../../2-Star/Admin-Section/README.md#how-i-solved-it)) to discover sensitive data, and another (SQL Injection) to escalate access.
 
 ## Solution Steps
 
@@ -30,21 +38,15 @@ This demonstrates a chained attack: using one vulnerability [Brute-Forcing the A
      Any value (e.g., `123`)
 3. Click “Login”
 
-The resulting SQL query becomes:
+**Resulting Query:**
 ```sql
 SELECT * FROM Users WHERE email = 'jim@juice-sh.op'--' AND password = '123';
 ```
 
-The `--` sequence comments out the rest of the query, effectively skipping the password check.
+The `--` sequence comments out the password check, allowing login without credentials.
 
 4. You will be logged in as user **Jim**
 5. The challenge “Login Jim” will be marked as solved
-
-## Techniques & Tools
-
-- SQL Injection: Manipulating SQL queries via crafted input
-- SQL comment sequence (`--`): Terminates the query early
-- Reconnaissance via admin panel: Used to discover Jim’s email address
 
 ## Takeaways
 
@@ -58,4 +60,4 @@ The `--` sequence comments out the rest of the query, effectively skipping the p
 ## Related Documentation
 
 See my previous write-up on logging in as the administrator and accessing the admin panel:  
-[Login as Administrator – SQL Injection & Admin Panel Access](../../2-Star/Admin-Section/README.md#hacking-challenge-submission-sql-injection--broken-access-control)
+[Login as Administrator – SQL Injection & Admin Panel Access](../../2-Star/Admin-Section/README.md#challenge-sql-injection--broken-access-control)
